@@ -402,7 +402,6 @@ class Command implements Loopable
         // Set all the properties on the instance.
         foreach ($data as $key => $value) {
             $reflection = new \ReflectionProperty($instance, $key);
-            $reflection->setAccessible(true);
             $reflection->setValue($instance, $value);
         }
 
