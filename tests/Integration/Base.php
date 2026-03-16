@@ -45,6 +45,8 @@ abstract class Base extends TestCase
 
     protected array $newFrameCallbacks = [];
 
+    protected string $tailLogPath;
+
     protected function getPackageProviders($app)
     {
         return [
@@ -56,7 +58,12 @@ abstract class Base extends TestCase
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
-            touch(storage_path('logs/laravel.log'));
+            $logPath = storage_path('logs/laravel.log');
+            touch($logPath);
+
+            $shortLogPath = '/tmp/solo-tail-' . uniqid() . '.log';
+            $this->tailLogPath = @symlink($logPath, $shortLogPath) ? $shortLogPath : $logPath;
+
             @symlink(
                 package_path('vendor', 'bin', 'testbench'),
                 package_path() . '/artisan',
@@ -237,6 +244,11 @@ abstract class Base extends TestCase
     protected function write(string $string)
     {
         echo $string;
+    }
+
+    protected function tailLogCommand(): string
+    {
+        return 'tail -f -n 100 ' . $this->tailLogPath;
     }
 
     protected function callNewFrameCallbacks($frame)

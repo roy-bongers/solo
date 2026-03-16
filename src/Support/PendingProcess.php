@@ -10,6 +10,7 @@
 namespace SoloTerm\Solo\Support;
 
 use Illuminate\Process\PendingProcess as BasePendingProcess;
+use Symfony\Component\Process\Process;
 
 class PendingProcess extends BasePendingProcess
 {
@@ -31,7 +32,7 @@ class PendingProcess extends BasePendingProcess
         return $this;
     }
 
-    protected function toSymfonyProcess(array|string|null $command): \Symfony\Component\Process\Process
+    protected function toSymfonyProcess(array|string|null $command): Process
     {
         $process = parent::toSymfonyProcess($command);
 

@@ -36,6 +36,8 @@ class BasicTest extends Base
     #[Test]
     public function stop_command_test()
     {
+        $logsCommand = $this->tailLogCommand();
+
         $actions = [
             function (string $ansi, string $plain) {
                 // Green
@@ -52,11 +54,11 @@ class BasicTest extends Base
             },
         ];
 
-        $this->runSolo($actions, function () {
+        $this->runSolo($actions, function () use ($logsCommand) {
             config()->set('solo.theme', 'light');
 
             config()->set('solo.commands', [
-                'Logs' => 'tail -f -n 100 ' . storage_path('logs/laravel.log')
+                'Logs' => $logsCommand
             ]);
         });
     }
@@ -66,6 +68,7 @@ class BasicTest extends Base
     {
         $rand = 'Testing ' . Str::random();
         Log::info($rand);
+        $logsCommand = $this->tailLogCommand();
 
         $actions = [
             fn(string $ansi, string $plain) => $this->assertStringContainsString($rand, $ansi),
@@ -73,9 +76,9 @@ class BasicTest extends Base
             fn(string $ansi, string $plain) => $this->assertStringNotContainsString($rand, $ansi),
         ];
 
-        $this->runSolo($actions, function () {
+        $this->runSolo($actions, function () use ($logsCommand) {
             config()->set('solo.commands', [
-                'Logs' => 'tail -f -n 100 ' . storage_path('logs/laravel.log')
+                'Logs' => $logsCommand
             ]);
         });
     }
@@ -85,6 +88,7 @@ class BasicTest extends Base
     {
         $rand = 'Testing ' . Str::random();
         Log::info($rand);
+        $logsCommand = $this->tailLogCommand();
 
         $actions = [
             fn(string $ansi, string $plain) => $this->assertStringContainsString($rand, $plain),
@@ -94,9 +98,9 @@ class BasicTest extends Base
             fn(string $ansi, string $plain) => $this->assertStringNotContainsString('Waiting...', $plain),
         ];
 
-        $this->runSolo($actions, function () {
+        $this->runSolo($actions, function () use ($logsCommand) {
             config()->set('solo.commands', [
-                'Logs' => 'tail -f -n 100 ' . storage_path('logs/laravel.log')
+                'Logs' => $logsCommand
             ]);
         });
     }

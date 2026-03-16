@@ -1,8 +1,8 @@
 <?php
 
 use SoloTerm\Solo\Commands\Command;
-use SoloTerm\Solo\Commands\EnhancedTailCommand;
 use SoloTerm\Solo\Commands\MakeCommand;
+use SoloTerm\Solo\Commands\TestCommand;
 use SoloTerm\Solo\Hotkeys;
 use SoloTerm\Solo\Themes;
 
@@ -47,7 +47,8 @@ return [
     */
     'commands' => [
         'About' => 'php artisan solo:about',
-        'Logs' => EnhancedTailCommand::file(storage_path('logs/laravel.log')),
+        // For enhanced log viewing with vendor frame collapsing, see soloterm/vtail
+        'Logs' => 'tail -f -n 100 ' . storage_path('logs/laravel.log'),
         'Vite' => 'npm run dev',
         'Make' => new MakeCommand,
         // 'HTTP' => 'php artisan serve',
@@ -57,7 +58,7 @@ return [
         'Reverb' => Command::from('php artisan reverb:start --debug')->lazy(),
         'Pint' => Command::from('./vendor/bin/pint --ansi')->lazy(),
         'Queue' => Command::from('php artisan queue:work')->lazy(),
-        'Tests' => Command::from('php artisan test --colors=always')->withEnv(['APP_ENV' => 'testing'])->lazy(),
+        'Tests' => TestCommand::artisan(),
     ],
 
     /**

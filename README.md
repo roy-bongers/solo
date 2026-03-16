@@ -57,14 +57,14 @@ Define your commands in the `commands` array:
 ```php
 'commands' => [
     'About' => 'php artisan solo:about',
-    'Logs' => EnhancedTailCommand::file(storage_path('logs/laravel.log')),
+    'Logs' => 'tail -f -n 100 ' . storage_path('logs/laravel.log'),
     'Vite' => 'npm run dev',
     'Make' => new MakeCommand,
-    
+
     // Lazy commands don't start automatically
     'Dumps' => Command::from('php artisan solo:dumps')->lazy(),
     'Queue' => Command::from('php artisan queue:work')->lazy(),
-    'Tests' => Command::from('php artisan test --colors=always')->lazy(),
+    'Tests' => TestCommand::artisan(),
 ],
 ```
 
@@ -74,17 +74,16 @@ You can define commands in several ways:
 'commands' => [
     // A simple string
     'About' => 'php artisan solo:about',
-    
+
     // A custom Command class
-    'Logs' => EnhancedTailCommand::file(storage_path('logs/laravel.log')),
     'Make' => new MakeCommand,
-    
+
     // Using the Command::from() static constructor
     'Dumps' => Command::from('php artisan solo:dumps')->lazy(),
 ],
 ```
 
-A simple string command is the easiest way, but if you need more control you're free to create your own custom class. The `EnhancedTailCommand` is a good example of what you can do in a custom command.
+A simple string command is the easiest way, but if you need more control you're free to create your own custom class.
 
 #### Lazy Commands
 
@@ -159,19 +158,6 @@ php artisan solo
 
 ## Special Commands
 
-### EnhancedTailCommand
-
-The `EnhancedTailCommand` provides improved log viewing with features like:
-
-- Vendor frame collapsing
-- Stack trace formatting
-- Toggle vendor frames with <kbd>v</kbd>
-- File truncating
-
-```php
-'Logs' => EnhancedTailCommand::file(storage_path('logs/laravel.log')),
-```
-
 ### MakeCommand
 
 Solo ships with a special `php artisan solo:make` command that proxies to all of the underlying `php artisan make:*`
@@ -181,6 +167,24 @@ It lives in a custom `MakeCommand` class.
 
 ```php
 'Make' => new MakeCommand,
+```
+
+### TestCommand
+
+The `TestCommand` provides a safe way to run tests that automatically sets `APP_ENV=testing`. This ensures your tests run in the correct environment and don't accidentally affect your local database.
+
+```php
+// Using Laravel's artisan test command (default)
+'Tests' => TestCommand::artisan(),
+
+// Using Pest
+'Tests' => TestCommand::pest(),
+
+// Using PHPUnit directly
+'Tests' => TestCommand::phpunit(),
+
+// Custom arguments
+'Tests' => TestCommand::artisan('--filter=UserTest'),
 ```
 
 ### `solo:dumps`
@@ -234,3 +238,13 @@ Special thanks to:
 - Joe's [Chewie package](https://github.com/joetannenbaum/chewie)
 - [Laravel Prompts](https://laravel.com/docs/11.x/prompts)
 - [Will King](https://x.com/wking__) for the Solo logo
+
+## Related Projects
+
+- [Screen](https://github.com/soloterm/screen) - Pure PHP terminal renderer
+- [Dumps](https://github.com/soloterm/dumps) - Laravel command to intercept dumps
+- [Grapheme](https://github.com/soloterm/grapheme) - Unicode grapheme width calculator
+- [Notify](https://github.com/soloterm/notify) - PHP package for desktop notifications via OSC escape sequences
+- [Notify Laravel](https://github.com/soloterm/notify-laravel) - Laravel integration for soloterm/notify
+- [TNotify](https://github.com/soloterm/tnotify) - Standalone, cross-platform CLI for desktop notifications
+- [VTail](https://github.com/soloterm/vtail) - Vendor-aware tail for Laravel logs
